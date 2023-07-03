@@ -53,7 +53,11 @@ type DirEntry struct {
 // list is an http.HandlerFunc which displays a directories listings.
 func (app *application) list(w http.ResponseWriter, r *http.Request) {
 	path := filepath.Join(app.dir, filepath.Clean(r.URL.Path))
-	title := strings.TrimPrefix(path, filepath.Clean(app.dir)+"/")
+	title := strings.TrimPrefix(path, filepath.Clean(app.dir))
+	title = strings.TrimPrefix(title, "/")
+	if title == "" {
+		title = "hidden in the fog"
+	}
 	dirEntries, err := os.ReadDir(path)
 	if err != nil {
 		app.errLog.Println("failed reading directory:", path)
@@ -116,6 +120,7 @@ func (app *application) list(w http.ResponseWriter, r *http.Request) {
 // VideoPage is the datastructure used in the video handler for the video
 // template.
 type VideoPage struct {
+	Title  string
 	Artist string
 	Video  string
 }
@@ -143,6 +148,12 @@ func (app *application) video(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	path := filepath.Join(app.dir, filepath.Clean(r.URL.Path))
+	title := strings.TrimPrefix(path, filepath.Clean(app.dir))
+	title = strings.TrimPrefix(title, "/")
+	if title == "" {
+		title = "hidden in the fog"
+	}
 	tsName := "video.tmpl"
 	ts, ok := app.templateCache[tsName]
 	if !ok {
@@ -154,6 +165,7 @@ func (app *application) video(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	err := ts.ExecuteTemplate(w, tsName, VideoPage{
+		Title: title,
 		Artist: strings.TrimPrefix(
 			filepath.Dir(filepath.Clean(r.URL.Path)),
 			"/",
