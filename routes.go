@@ -120,9 +120,9 @@ func (app *application) list(w http.ResponseWriter, r *http.Request) {
 // VideoPage is the datastructure used in the video handler for the video
 // template.
 type VideoPage struct {
-	Title  string
-	Artist string
-	Video  string
+	Title     string
+	Directory string
+	Video     string
 }
 
 // video is an http.HandlerFunc for videos.
@@ -166,7 +166,7 @@ func (app *application) video(w http.ResponseWriter, r *http.Request) {
 	}
 	err := ts.ExecuteTemplate(w, tsName, VideoPage{
 		Title: title,
-		Artist: strings.TrimPrefix(
+		Directory: strings.TrimPrefix(
 			filepath.Dir(filepath.Clean(r.URL.Path)),
 			"/",
 		),
