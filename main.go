@@ -18,7 +18,7 @@ type application struct {
 
 func main() {
 	addr := flag.String("addr", ":4000", "HTTP network address")
-	content := flag.String("path", "/var/www/html/hiddeninthefog", "Path to vids")
+	content := flag.String("path", "/var/www/fog", "Path to vids")
 	flag.Parse()
 
 	infoLog := log.New(os.Stdout, "INFO ", log.Ldate|log.Ltime)
