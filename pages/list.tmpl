@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang='en'>
+	<head>
+		<meta charset='utf-8'>
+		<title>Hidden in the Fog</title>
+		<link rel='stylesheet' href='/static/main.css'>
+		<link rel='shortcut icon' href='/static/favicon.png'>
+	</head>
+	<body>
+		<main>
+			{{range .Entries}}
+			<a href="{{.URL}}">
+				<ol class="entry">
+					<li class="name">{{.Name}}</li>
+					<li class="time">{{.Time}}</li>
+				</ol>
+			</a>
+			{{end}}
+		</main>
+	</body>
+</html>
