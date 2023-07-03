@@ -47,6 +47,7 @@ type ListPage struct {
 type DirEntry struct {
 	Name string
 	URL  string
+	Ext  string
 	Size int64
 	Time string
 }
@@ -78,7 +79,7 @@ func (app *application) list(w http.ResponseWriter, r *http.Request) {
 		if strings.HasSuffix(e.Name(), ".vtt") {
 			continue
 		}
-		name := e.Name()
+		name := strings.TrimSuffix(e.Name(), filepath.Ext(e.Name()))
 		if len(name) > 60 {
 			name = name[:57] + "..."
 		}
@@ -131,7 +132,9 @@ func (app *application) list(w http.ResponseWriter, r *http.Request) {
 type VideoPage struct {
 	Title     string
 	Directory string
-	Video     string
+	URL       string
+	VTT       string
+	Ext       string
 }
 
 // video is an http.HandlerFunc for videos.
@@ -158,8 +161,7 @@ func (app *application) video(w http.ResponseWriter, r *http.Request) {
 	}
 
 	path := filepath.Join(app.dir, filepath.Clean(r.URL.Path))
-	title := strings.TrimPrefix(path, filepath.Clean(app.dir))
-	title = strings.TrimPrefix(title, "/")
+	title := strings.Trim(filepath.Base(path), filepath.Ext(path))
 	if title == "" {
 		title = "hidden in the fog"
 	}
@@ -179,7 +181,12 @@ func (app *application) video(w http.ResponseWriter, r *http.Request) {
 			filepath.Dir(filepath.Clean(r.URL.Path)),
 			"/",
 		),
-		Video: filepath.Clean(r.URL.Path),
+		URL: filepath.Clean(r.URL.Path),
+		VTT: strings.TrimSuffix(
+			filepath.Clean(r.URL.Path),
+			filepath.Ext(r.URL.Path),
+		) + ".vtt",
+		Ext: strings.TrimPrefix(filepath.Ext(r.URL.Path), "."),
 	})
 	if err != nil {
 		app.errLog.Println(err)

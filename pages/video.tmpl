@@ -8,16 +8,22 @@
 	</head>
 	<body>
 		<header>
-			<a href="/{{.Directory}}"><h1>{{.Directory}}</h1></a>
+			<h1>{{.Title}}</h1>
+			<h2>by <a href="/{{.Directory}}">{{.Directory}}</a></h2>
 		</header>
 		<main>
 			<video
 				controls
 				width="100%"
 				height="auto"
-				preload="auto"
-			  >
-				<source src="{{.Video}}?direct" type="video/mp4" />
+				preload="auto" />
+			<source src="{{.URL}}?direct" type="video/{{.Ext}}" />
+			<track
+				label="English"
+				kind="subtitles"
+				srclang="en"
+				src="{{.VTT}}?direct"
+				default />
 			</video>
 		</main>
 	</body>
