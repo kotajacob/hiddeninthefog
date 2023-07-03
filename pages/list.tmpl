@@ -3,18 +3,22 @@
 	<head>
 		<meta charset='utf-8'>
 		<title>Hidden in the Fog</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="color-scheme" content="light dark">
 		<link rel='stylesheet' href='/static/main.css'>
 		<link rel='shortcut icon' href='/static/favicon.png'>
 	</head>
 	<body>
+		<header>
+			<a href="/">
+				<img alt="Hidden in the Fog" src="/static/fog.png">
+			</a>
+		</header>
 		<main>
 			{{range .Entries}}
-			<a href="{{.URL}}">
-				<ol class="entry">
-					<li class="name">{{.Name}}</li>
-					<li class="time">{{.Time}}</li>
-				</ol>
-			</a>
+			<div class="entry">
+				<a href="{{.URL}}">{{.Name}}</a>
+			</div>
 			{{end}}
 		</main>
 	</body>

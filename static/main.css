@@ -1,7 +1,52 @@
+*,
+:after,
+:before {
+	box-sizing:border-box;
+	background-color:inherit;
+	font-family:inherit;
+	color:inherit;
+	overflow-wrap:break-word;
+	margin:0;
+	padding:0;
+	border:0 solid;
+}
+
+:root {
+	--ratio: 1.5;
+	--s-2: calc(var(--s-1) / var(--ratio));
+	--s-1: calc(var(--s0) / var(--ratio));
+	--s0: 1rem;
+	--s1: calc(var(--s0) * var(--ratio));
+	--s2: calc(var(--s1) * var(--ratio));
+	--fg: #36353e;
+	--bg: #e5cedf;
+}
+
 html {
-  max-width: 70ch;
-  padding: 3em 1em;
-  margin: auto;
-  line-height: 1.75;
-  font-size: 1.25em;
+	padding: 3em 1em;
+	line-height: 1.75;
+	font-size: 1.25em;
+	font-weight: bold;
+	font-family: 'Iowan Old Style', 'Palatino Linotype', 'URW Palladio L', P052, serif;
+	color: var(--fg);
+	background-color: var(--bg);
+}
+
+body {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+}
+
+body > * + * {
+	margin-block-start: var(--s2);
+}
+
+main > * + * {
+	margin-block-start: var(--s0);
+}
+
+video {
+	width: 100ch;
 }
