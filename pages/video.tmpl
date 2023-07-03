@@ -27,4 +27,31 @@
 			</video>
 		</main>
 	</body>
+	<script>
+		function storeCurrentTime(){
+			const videos = document.getElementsByTagName("video");
+			if (videos.length > 0) {
+				video = videos[0];
+				localStorage.setItem("{{.URL}}", video.currentTime);
+			}
+			console.log(videos);
+		}
+
+		function setCurrentTime(){
+			const videos = document.getElementsByTagName("video");
+			if (videos.length > 0) {
+				video = videos[0];
+				const time = localStorage.getItem("{{.URL}}");
+				if (time) {
+					video.currentTime = time;
+				}
+			}
+		}
+
+		setCurrentTime();
+
+		setInterval(function(){
+			storeCurrentTime()
+		}, 15000)
+	</script>
 </html>
