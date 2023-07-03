@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 )
 
@@ -49,6 +50,13 @@ type DirEntry struct {
 	Size int64
 	Time string
 }
+type Entries []DirEntry
+
+func (e Entries) Len() int      { return len(e) }
+func (e Entries) Swap(i, j int) { e[i], e[j] = e[j], e[i] }
+func (e Entries) Less(i, j int) bool {
+	return e[i].Name > e[j].Name
+}
 
 // list is an http.HandlerFunc which displays a directories listings.
 func (app *application) list(w http.ResponseWriter, r *http.Request) {
@@ -65,7 +73,7 @@ func (app *application) list(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var entries []DirEntry
+	var entries Entries
 	for _, e := range dirEntries {
 		if strings.HasSuffix(e.Name(), ".vtt") {
 			continue
@@ -92,6 +100,7 @@ func (app *application) list(w http.ResponseWriter, r *http.Request) {
 			Time: info.ModTime().Format("Jan 02 15:04 2006"),
 		})
 	}
+	sort.Sort(entries)
 
 	tsName := "list.tmpl"
 	ts, ok := app.templateCache[tsName]
