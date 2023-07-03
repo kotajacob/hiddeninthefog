@@ -63,6 +63,9 @@ func (app *application) list(w http.ResponseWriter, r *http.Request) {
 
 	var entries []DirEntry
 	for _, e := range dirEntries {
+		if strings.HasSuffix(e.Name(), ".vtt") {
+			continue
+		}
 		name := e.Name()
 		if len(name) > 60 {
 			name = name[:57] + "..."
