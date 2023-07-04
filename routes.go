@@ -7,22 +7,97 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"github.com/justinas/alice"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func (app *application) routes() http.Handler {
-	static := http.FileServer(http.FS(Static))
-
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", app.path)
-	mux.Handle("/static/", static)
 
-	return app.logRequest(mux)
+	dynamic := alice.New(app.sessionManager.LoadAndSave)
+
+	mux.Handle("/", dynamic.ThenFunc(app.pathHandler))
+	mux.Handle("/answer", dynamic.ThenFunc(app.answerHandler))
+
+	staticHandler := http.FileServer(http.FS(Static))
+	mux.Handle("/static/", staticHandler)
+
+	standard := alice.New(app.logRequest)
+	return standard.Then(mux)
 }
 
-// path is an http.HandlerFunc which passes the request to either artist,
-// video, or file depending on if the request is for a file, video file, or
-// directory.
-func (app *application) path(w http.ResponseWriter, r *http.Request) {
+// RiddlePage is the datastructure used on list pages.
+type RiddlePage struct {
+	Riddle string
+}
+
+func (app *application) riddleHandler(w http.ResponseWriter, r *http.Request) {
+	tsName := "riddle.tmpl"
+	ts, ok := app.templateCache[tsName]
+	if !ok {
+		app.errLog.Println(fmt.Errorf(
+			"the template %s is missing",
+			tsName,
+		))
+		http.NotFound(w, r)
+		return
+	}
+	err := ts.ExecuteTemplate(w, tsName, RiddlePage{
+		Riddle: app.riddle,
+	})
+	if err != nil {
+		app.errLog.Println(err)
+		http.Error(
+			w,
+			http.StatusText(http.StatusInternalServerError),
+			http.StatusInternalServerError,
+		)
+	}
+}
+
+func (app *application) answerHandler(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(
+			w,
+			http.StatusText(http.StatusBadRequest),
+			http.StatusBadRequest,
+		)
+		return
+	}
+
+	a := r.PostForm.Get("answer")
+	err = bcrypt.CompareHashAndPassword([]byte(app.answer), []byte(a))
+	if err != nil {
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return
+	}
+
+	err = app.sessionManager.RenewToken(r.Context())
+	if err != nil {
+		app.errLog.Println(err)
+		http.Error(
+			w,
+			http.StatusText(http.StatusInternalServerError),
+			http.StatusInternalServerError,
+		)
+		return
+	}
+
+	app.sessionManager.Put(r.Context(), "solved", true)
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+}
+
+// pathHandler is an http.HandlerFunc which passes the request to a more specific
+// handler depending on if the user is requesting a directory or file.
+func (app *application) pathHandler(w http.ResponseWriter, r *http.Request) {
+	_, ok := app.sessionManager.Get(r.Context(), "solved").(bool)
+	if !ok {
+		app.riddleHandler(w, r)
+		return
+	}
+
 	path := filepath.Join(app.dir, filepath.Clean(r.URL.Path))
 	info, err := os.Stat(path)
 	if err != nil {

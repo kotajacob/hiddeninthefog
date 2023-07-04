@@ -13,13 +13,16 @@
 
 :root {
 	--ratio: 1.5;
+	--s-3: calc(var(--s-2) / var(--ratio));
 	--s-2: calc(var(--s-1) / var(--ratio));
 	--s-1: calc(var(--s0) / var(--ratio));
 	--s0: 1rem;
 	--s1: calc(var(--s0) * var(--ratio));
 	--s2: calc(var(--s1) * var(--ratio));
+	--s3: calc(var(--s2) * var(--ratio));
 	--fg: #36353e;
 	--bg: #e5cedf;
+	--bg-light: #f5edf3;
 }
 
 html {
@@ -49,4 +52,13 @@ main > * + * {
 
 video {
 	max-width: 100ch;
+}
+
+input {
+	width: 100%;
+	font-size: 1em;
+	font-weight: bold;
+	padding: var(--s-3);
+	border-bottom: medium solid var(--fg);
+	outline: none;
 }

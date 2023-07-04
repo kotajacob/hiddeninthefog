@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang='en'>
+	<head>
+		<meta charset='utf-8'>
+		<title>hidden in the fog</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="color-scheme" content="light dark">
+		<link rel='stylesheet' href='/static/main.css'>
+		<link rel='shortcut icon' href='/static/favicon.png'>
+	</head>
+	<body>
+		<header>
+			<a href="/">
+				<img src="/static/fog.png" width="553px" height="634px">
+			</a>
+		</header>
+		<main>
+			<pre>{{.Riddle}}</pre>
+			<form action='/answer' method='POST'>
+				<input type='text' name='answer'>
+			</form>
+		</main>
+	</body>
+</html>

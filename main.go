@@ -6,6 +6,9 @@ import (
 	"net/http"
 	"os"
 	"text/template"
+	"time"
+
+	"github.com/alexedwards/scs/v2"
 )
 
 type application struct {
@@ -14,11 +17,17 @@ type application struct {
 
 	infoLog *log.Logger
 	errLog  *log.Logger
+
+	sessionManager *scs.SessionManager
+
+	riddle string
+	answer string
 }
 
 func main() {
 	addr := flag.String("addr", ":4000", "HTTP network address")
 	content := flag.String("path", "/var/www/fog", "Path to vids")
+	config := flag.String("config", "/etc/fog", "Path to configurations")
 	flag.Parse()
 
 	infoLog := log.New(os.Stdout, "INFO ", log.Ldate|log.Ltime)
@@ -29,11 +38,22 @@ func main() {
 		errLog.Fatal(err)
 	}
 
+	sessionManager := scs.New()
+	sessionManager.Lifetime = time.Hour * 24 * 365 * 5
+
+	riddle, answer, err := loadRiddle(*config)
+	if err != nil {
+		errLog.Fatal(err)
+	}
+
 	app := &application{
-		dir:           *content,
-		templateCache: tc,
-		infoLog:       infoLog,
-		errLog:        errLog,
+		dir:            *content,
+		templateCache:  tc,
+		infoLog:        infoLog,
+		errLog:         errLog,
+		sessionManager: sessionManager,
+		riddle:         riddle,
+		answer:         answer,
 	}
 
 	srv := &http.Server{
