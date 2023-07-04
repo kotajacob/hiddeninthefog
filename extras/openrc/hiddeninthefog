@@ -1,0 +1,12 @@
+#!/sbin/openrc-run
+
+description="hidden in the fog"
+command=${command:-/usr/sbin/hiddeninthefog}
+command_background=true
+pidfile="/run/${RC_SVCNAME}.pid"
+command_args="-addr :4001"
+
+depend() {
+	need net
+	use dns logger netmount
+}
