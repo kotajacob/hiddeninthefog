@@ -263,17 +263,5 @@ func (app *application) video(w http.ResponseWriter, r *http.Request) {
 // file serves a given file directly.
 func (app *application) file(w http.ResponseWriter, r *http.Request) {
 	path := filepath.Join(app.dir, filepath.Clean(r.URL.Path))
-	info, err := os.Stat(path)
-	if err != nil {
-		app.errLog.Println(err)
-		http.NotFound(w, r)
-		return
-	}
-	f, err := os.Open(path)
-	if err != nil {
-		app.errLog.Println(err)
-		http.NotFound(w, r)
-		return
-	}
-	http.ServeContent(w, r, path, info.ModTime(), f)
+	http.ServeFile(w, r, path)
 }
